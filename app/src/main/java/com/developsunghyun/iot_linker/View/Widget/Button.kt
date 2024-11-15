@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,20 +18,30 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Composable
 fun ButtonWidget(
-    number: Int = 1,
-    labelList: MutableList<String> = mutableListOf("Button1", "a"),
-    position: Int = 0
+    labelStrList: String? = "Button1,a,v,3.14",
+    positionStrList: String = "0,1,2,1"
 ){
+
+    val labelList = if (labelStrList != null) {
+        labelStrList.split(",").toMutableList()
+    }else{
+        mutableListOf()
+    }
+    val positionList = if (positionStrList != null){
+        positionStrList.split(",").toMutableList()
+    }else{
+        mutableListOf()
+    }
+
     Surface(
         modifier = Modifier
     ) {
-        Column(
-
-        ) {
-            for (colNum in labelList){
-                ButtonCell(label = colNum, position = 0)
+        LazyColumn {
+            items(labelList.size){ index ->
+                ButtonCell(label = labelList[index], position = positionList[index].toInt())
             }
         }
+
     }
 }
 
