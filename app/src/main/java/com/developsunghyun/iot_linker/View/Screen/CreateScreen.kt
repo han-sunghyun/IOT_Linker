@@ -1,6 +1,6 @@
 package com.developsunghyun.iot_linker.View.Screen
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +12,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.developsunghyun.iot_linker.R
 
 @Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
@@ -27,6 +31,7 @@ fun LayoutSelect(){
 
         ) {
             SelectButton()
+            LayoutImageView(image = R.drawable.layout_2slot_1)
         }
     }
 }
@@ -72,5 +77,25 @@ fun SelectButton(
                 else MaterialTheme.colorScheme.background
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun LayoutImageView(
+    image: Int = R.drawable.layout_2slot_1
+){
+    Surface(
+        shape = RoundedCornerShape(5.dp)
+    ) {
+        Image(
+            modifier = Modifier
+                .clickable {
+
+                },
+            painter = painterResource(id = image),
+            contentDescription = "layout_2slot_1",
+//            colorFilter = ColorFilter.tint(Color.White)
+        )
     }
 }
