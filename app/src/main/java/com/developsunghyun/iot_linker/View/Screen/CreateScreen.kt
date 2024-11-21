@@ -1,5 +1,6 @@
 package com.developsunghyun.iot_linker.View.Screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,17 +13,24 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.developsunghyun.iot_linker.Model.Data.LayoutDataList
 import com.developsunghyun.iot_linker.R
+import com.developsunghyun.iot_linker.ViewModel.CreateViewModel
 
-@Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
-fun LayoutSelect(){
+fun LayoutSelect(
+    navController : NavController,
+    viewModel: CreateViewModel = viewModel(LocalContext.current as ViewModelStoreOwner)
+){
+
     Surface(
         modifier = Modifier
             .padding(10.dp)
@@ -31,9 +39,23 @@ fun LayoutSelect(){
 
         ) {
             SelectButton()
-            LayoutImageView(image = R.drawable.layout_2slot_1)
+
+
+            for (layout in LayoutDataList.layoutListData){
+                LayoutImageView(
+                    onClick = {
+                        viewModel.setLayoutType(layoutType = layout.layoutType)
+                        viewModel.setSlitNumber(layout.slotNumber)
+
+                        navController.navigate("LayoutCompositionView")
+                    },
+                    image = layout.image
+                )
+            }
+
         }
     }
+
 }
 
 @Preview
@@ -83,18 +105,18 @@ fun SelectButton(
 @Preview
 @Composable
 fun LayoutImageView(
-    image: Int = R.drawable.layout_2slot_1
+    onClick: () -> Unit = {},
+    image: Int = R.drawable.layout_2slot_1,
+    name: String = ""
 ){
     Surface(
         shape = RoundedCornerShape(5.dp)
     ) {
         Image(
             modifier = Modifier
-                .clickable {
-
-                },
+                .clickable {onClick()} ,
             painter = painterResource(id = image),
-            contentDescription = "layout_2slot_1",
+            contentDescription = name,
 //            colorFilter = ColorFilter.tint(Color.White)
         )
     }

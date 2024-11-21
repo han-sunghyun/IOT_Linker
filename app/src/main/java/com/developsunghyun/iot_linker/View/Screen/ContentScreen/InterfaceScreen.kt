@@ -15,11 +15,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.developsunghyun.iot_linker.View.Components.ItemLayout
 
-@Preview(showBackground = true, widthDp = 370, heightDp = 740)
+//@Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
-fun InterfaceScreen(){
+fun InterfaceScreen(
+    navController : NavController
+){
     Box(
         modifier = Modifier
             .padding(6.dp),
@@ -57,7 +60,7 @@ fun InterfaceScreen(){
             contentAlignment = Alignment.BottomEnd,
         ) {
             FloatingActionButton(
-                onClick = { println() },
+                onClick = { navController.navigate("LayoutSelect") },
             ) {
                 Icon(Icons.Filled.Add, "Floating action button.")
             }

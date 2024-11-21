@@ -7,15 +7,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.developsunghyun.iot_linker.Model.Repository.DBManager
-import com.developsunghyun.iot_linker.View.Layout.Layout_2Slot_1
-import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
-import com.developsunghyun.iot_linker.View.Widget.SwitchWidget
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.developsunghyun.iot_linker.View.Screen.HomeScreen
+import com.developsunghyun.iot_linker.View.Screen.LayoutCompositionView
+import com.developsunghyun.iot_linker.View.Screen.LayoutSelect
+import com.developsunghyun.iot_linker.ViewModel.CreateViewModel
 import com.developsunghyun.iot_linker.ui.theme.IOT_LinkerTheme
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     @SuppressLint("CoroutineCreationDuringComposition")
@@ -23,16 +25,27 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            IOT_LinkerTheme {
-                val coroutineScope = rememberCoroutineScope()
-//                HomeScreen()
-                Layout_2Slot_1(module1 = { SwitchWidget(labelStrList = "Button1,a,b,c", stateSetStrList = "false,true,false,false")},
-                    module2 = {ButtonWidget(labelStrList = "a,b,c", positionStrList = "0,1,2,1")})
+            IOT_LinkerTheme() {
+//                val coroutineScope = rememberCoroutineScope()
+////                HomeScreen()
+//                Layout_2Slot_1(module1 = { SwitchWidget(labelStrList = "Button1,a,b,c", stateSetStrList = "false,true,false,false")},
+//                    module2 = {ButtonWidget(labelStrList = "a,b,c", positionStrList = "0,1,2,1")})
+//
+//                val dbManager = LocalDataRepository(applicationContext)
+//
+//                coroutineScope.launch {
+//                    dbManager.testInsert()
+//                }
 
-                val dbManager = DBManager(applicationContext)
+                val navController = rememberNavController()
 
-                coroutineScope.launch {
-                    dbManager.testInsert()
+                NavHost(
+                    navController = navController,
+                    startDestination = "homeScreen",
+                ) {
+                    composable("HomeScreen") { HomeScreen(navController) }
+                    composable("LayoutSelect") { LayoutSelect(navController) }
+                    composable("LayoutCompositionView") { LayoutCompositionView(navController = navController)}
                 }
             }
         }

@@ -9,7 +9,7 @@ data class DBItemData(
     var id : Int = 0,
     var layoutName: String,
     var layoutType: String,
-    var modul: String
+    var moduleStringList: String
 )
 
 @Entity(tableName = "widget")

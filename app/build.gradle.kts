@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.room:room-common:2.6.1")
     implementation("androidx.room:room-runtime-android:2.7.0-alpha11")
+    implementation(libs.androidx.runtime.livedata)
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.navigation:navigation-compose:2.8.3")
 

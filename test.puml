@@ -1,0 +1,56 @@
+@startuml
+class com.developsunghyun.iot_linker.Model.Data.DBItemData {
+}
+class com.developsunghyun.iot_linker.Model.Data.WidgetData {
+}
+class com.developsunghyun.iot_linker.Model.Data.CreateLayoutData {
+}
+interface com.developsunghyun.iot_linker.Model.Data.ItemDao {
++ void insert(DBItemData)
++ void update(DBItemData)
++ void delete(DBItemData)
++ Flow<DBItemData> getItem(Int)
++ Flow<List<DBItemData>> getAllItems()
+}
+
+class com.developsunghyun.iot_linker.Model.Repository.DataBase$Companion {
+- DataBase? Instance
++ DataBase getDatabase(Context)
+}
+
+
+abstract class com.developsunghyun.iot_linker.Model.Repository.DataBase {
++ ItemDao dbItemDao()
+}
+
+enum com.developsunghyun.iot_linker.LayoutType {
+}
+class com.developsunghyun.iot_linker.MainActivity {
++ void onCreate(Bundle?)
+}
+
+class com.developsunghyun.iot_linker.ViewModel.CreateViewModel {
+-  _layoutData
++ LiveData<CreateLayoutData> layoutData
++ void setLayoutType(String)
+}
+
+
+class com.developsunghyun.iot_linker.Model.Data.LayoutItemData {
+}
+class com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository {
++  dbContext
++  dao
++ void testInsert()
+}
+
+
+class com.developsunghyun.iot_linker.View.Screen.NavigationItem {
+}
+
+
+com.developsunghyun.iot_linker.Model.Repository.DataBase +.. com.developsunghyun.iot_linker.Model.Repository.DataBase$Companion
+androidx.room.RoomDatabase <|-- com.developsunghyun.iot_linker.Model.Repository.DataBase
+androidx.activity.ComponentActivity <|-- com.developsunghyun.iot_linker.MainActivity
+androidx.lifecycle.ViewModel <|-- com.developsunghyun.iot_linker.ViewModel.CreateViewModel
+@enduml

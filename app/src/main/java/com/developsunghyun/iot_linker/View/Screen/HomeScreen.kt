@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.InterfaceScreen
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.ModuleScreen
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.NoneScreen
@@ -32,9 +33,10 @@ import com.developsunghyun.iot_linker.View.Screen.ContentScreen.ToolScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview(showBackground = true, widthDp = 370, heightDp = 800)
 @Composable
-fun HomeScreen(){
+fun HomeScreen(
+    navController : NavController
+){
 
     val bottomNavItemList: List<NavigationItem> =
         listOf(
@@ -97,8 +99,8 @@ fun HomeScreen(){
                 .padding(paddingValues)
             ){
                 when(selectIndex){
-                    0 -> InterfaceScreen()
-                    1 -> ModuleScreen()
+                    0 -> InterfaceScreen(navController)
+                    1 -> ModuleScreen(navController)
                     2 -> ToolScreen()
                     3 -> NoneScreen()
                 }
