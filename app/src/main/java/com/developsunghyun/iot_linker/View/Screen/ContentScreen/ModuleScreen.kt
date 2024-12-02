@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,8 @@ import com.developsunghyun.iot_linker.View.Components.ItemLayout
 //@Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
 fun ModuleScreen(
-    navController : NavController
+    navController : NavController,
+    windowSizeClass: WindowWidthSizeClass,
 ){
     Box(
         modifier = Modifier

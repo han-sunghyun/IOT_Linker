@@ -1,5 +1,6 @@
 package com.developsunghyun.iot_linker.View.Components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,8 +32,8 @@ fun SlotBox(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.onBackground)
             .fillMaxSize()
-            .padding(5.dp),
-        shape = RoundedCornerShape(10.dp),
+            .padding(3.dp),
+        shape = RoundedCornerShape(7.dp),
     ) {
         Box(
             contentAlignment = Alignment.Center
@@ -47,7 +48,9 @@ fun SlotBox(
         ) {
 
             SmallFloatingActionButton(
-                onClick = {  },
+                onClick = {
+                    Log.d("LOG", slotNumber.toString())
+                },
             ) {
                 Icon(Icons.Filled.Create, "Floating action button.")
             }

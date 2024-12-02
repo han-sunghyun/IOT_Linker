@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import com.developsunghyun.iot_linker.View.Layout.Layout_2Slot_1
 import com.developsunghyun.iot_linker.View.Layout.Layout_2Slot_2
 import com.developsunghyun.iot_linker.View.Layout.Layout_2Slot_3
+import com.developsunghyun.iot_linker.View.Layout.Layout_3Slot_1
+import com.developsunghyun.iot_linker.View.Layout.Layout_3Slot_2
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 import com.developsunghyun.iot_linker.View.Widget.SwitchWidget
 
@@ -27,6 +29,11 @@ class LayoutPrint(
                 { Layout_2Slot_2( { widgetList[0][module[0]]?.invoke() }, { widgetList[1][module[1]]?.invoke() }) },
         "Layout_2Slot_3" to
                 { Layout_2Slot_3( { widgetList[0][module[0]]?.invoke() }, { widgetList[1][module[1]]?.invoke() }) },
+
+        "Layout_3Slot_1" to
+                { Layout_3Slot_1( { widgetList[0][module[0]]?.invoke() }, { widgetList[1][module[1]]?.invoke() }, { widgetList[2][module[2]]?.invoke() }) },
+        "Layout_3Slot_2" to
+                { Layout_3Slot_2( { widgetList[0][module[0]]?.invoke() }, { widgetList[1][module[1]]?.invoke() }, { widgetList[2][module[2]]?.invoke() }) },
     )
 
     @Composable

@@ -58,9 +58,12 @@ fun ItemLayout(modifier: Modifier = Modifier){
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun ItemLayout2(modifier: Modifier = Modifier){
+fun ItemLayout2(
+    modifier: Modifier = Modifier,
+    image: Int,
+    label: String
+){
     Surface(
         modifier = modifier
             .wrapContentSize()
@@ -76,7 +79,7 @@ fun ItemLayout2(modifier: Modifier = Modifier){
                     .clickable {
                         Log.d("LOG", "클릭")
                     },
-                painter = painterResource(id = R.drawable.ic_launcher_background),
+                painter = painterResource(id = image),
                 contentDescription = stringResource(id = R.string.app_name)
             )
             Box(
@@ -85,7 +88,7 @@ fun ItemLayout2(modifier: Modifier = Modifier){
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Name",
+                    text = label,
                     fontSize = 14.sp,
                 )
             }

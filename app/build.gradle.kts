@@ -65,8 +65,13 @@ dependencies {
     implementation("androidx.room:room-common:2.6.1")
     implementation("androidx.room:room-runtime-android:2.7.0-alpha11")
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.adaptive.android)
+    implementation(libs.androidx.adaptive.layout.android)
     ksp("androidx.room:room-compiler:${rootProject.extra["room_version"]}")
     implementation("androidx.navigation:navigation-compose:2.8.3")
+
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

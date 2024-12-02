@@ -3,8 +3,6 @@ class com.developsunghyun.iot_linker.Model.Data.DBItemData {
 }
 class com.developsunghyun.iot_linker.Model.Data.WidgetData {
 }
-class com.developsunghyun.iot_linker.Model.Data.CreateLayoutData {
-}
 interface com.developsunghyun.iot_linker.Model.Data.ItemDao {
 + void insert(DBItemData)
 + void update(DBItemData)
@@ -13,6 +11,20 @@ interface com.developsunghyun.iot_linker.Model.Data.ItemDao {
 + Flow<List<DBItemData>> getAllItems()
 }
 
+class com.developsunghyun.iot_linker.View.LayoutPrint {
+- List<Map<String, @Composable () -> Unit>> widgetList
+- Map<String,  @Composable (@Composable () -> Unit) -> Unit> layout2Slot
++ void null()
++ void null()
++ void null()
++ void null()
++ void null()
++ void PreView()
+}
+
+
+class com.developsunghyun.iot_linker.Model.Data.InterfaceLayoutData {
+}
 class com.developsunghyun.iot_linker.Model.Repository.DataBase$Companion {
 - DataBase? Instance
 + DataBase getDatabase(Context)
@@ -23,29 +35,36 @@ abstract class com.developsunghyun.iot_linker.Model.Repository.DataBase {
 + ItemDao dbItemDao()
 }
 
-enum com.developsunghyun.iot_linker.LayoutType {
-}
 class com.developsunghyun.iot_linker.MainActivity {
 + void onCreate(Bundle?)
 }
 
+class com.developsunghyun.iot_linker.Model.Data.WidgetsData {
+}
 class com.developsunghyun.iot_linker.ViewModel.CreateViewModel {
 -  _layoutData
-+ LiveData<CreateLayoutData> layoutData
++ State<LayoutItem> layoutData
 + void setLayoutType(String)
++ void setSlitNumber(Int)
++ void setModuleArray(Int,String)
 }
 
 
-class com.developsunghyun.iot_linker.Model.Data.LayoutItemData {
-}
 class com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository {
 +  dbContext
 +  dao
 + void testInsert()
++ LiveData<DBItemData> getData()
 }
 
 
+class com.developsunghyun.iot_linker.Model.Data.LayoutDataList {
++ List<InterfaceLayoutData> layoutListData
+}
+
 class com.developsunghyun.iot_linker.View.Screen.NavigationItem {
+}
+class com.developsunghyun.iot_linker.Model.Data.LayoutItem {
 }
 
 
