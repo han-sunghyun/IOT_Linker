@@ -2,6 +2,8 @@ package com.developsunghyun.iot_linker.View.Screen
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,27 +23,187 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.developsunghyun.iot_linker.Model.Data.BluetoothDeviceData
+import com.developsunghyun.iot_linker.Model.Repository.BluetoothControl
+import com.developsunghyun.iot_linker.R
+import com.developsunghyun.iot_linker.View.Components.MinimalDialog
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.InterfaceScreen
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.ModuleScreen
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.NoneScreen
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.ToolScreen
+import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun HomeScreen(
+    navController: NavController,
+    context: Context
+) {
+    // BluetoothControlViewModel 초기화 (viewModel() 사용)
+    val bluetoothViewModel: BluetoothControlViewModel = viewModel(factory = BluetoothControlViewModelFactory(context))
+
+    val windowSizeClass = calculateWindowSizeClass(LocalContext.current as Activity)
+    var selectIndex by remember { mutableIntStateOf(0) }
+
+    // 공통 레이아웃 처리 (BottomNavigation 또는 SideNavigation)
+    NavigationLayout(
+        selectIndex = selectIndex,
+        navController = navController,
+        windowSizeClass = windowSizeClass,
+        viewModel = bluetoothViewModel,
+        onSelectIndexChanged = { newIndex -> selectIndex = newIndex },
+        isSideNavigation = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NavigationLayout(
+    selectIndex: Int,
+    navController: NavController,
+    windowSizeClass: WindowSizeClass,
+    viewModel: BluetoothControlViewModel,
+    onSelectIndexChanged: (Int) -> Unit,
+    isSideNavigation: Boolean // 사이드 네비게이션 여부
+) {
+    val device = viewModel.deviceData.collectAsState()
+    var dialogView by remember { mutableStateOf(false) }
+
+    // 다이얼로그 처리
+    if (dialogView) {
+        viewModel.searchPairedDevices()
+        MinimalDialog(viewModel) { dialogView = false }
+    }
+
+    if (isSideNavigation) {
+        Row {
+            // 사이드 네비게이션
+            NavigationRail {
+                Spacer(Modifier.padding(top = 70.dp))
+                bottomNavItemList.forEachIndexed { index, navigationItem ->
+                    NavigationRailItem(
+                        selected = selectIndex == index,
+                        icon = { Icon(imageVector = navigationItem.icon, "") },
+                        label = { Text(navigationItem.label) },
+                        onClick = { onSelectIndexChanged(index) }
+                    )
+                    Spacer(Modifier.padding(top = 10.dp))
+                }
+            }
+            Box(modifier = Modifier.weight(1f)) {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text("Medium Top App Bar", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            },
+                            actions = {
+                                TextButton(onClick = { dialogView = true }) {
+                                    Text(text = device.value.deviceName)
+                                }
+                                IconButton(onClick = { viewModel.connectToDevice(device.value.deviceAddress) }) {
+                                    Icon(modifier = Modifier.padding(0.dp), painter = painterResource(id = R.drawable.bluetooth), contentDescription = "Localized description")
+                                }
+                            }
+                        )
+                    },
+                    content = { paddingValues ->
+                        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                            when (selectIndex) {
+                                0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
+                                1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
+                                2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
+                                3 -> NoneScreen()
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    } else {
+        // 바텀 네비게이션
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text("IOT Linker", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    },
+                    actions = {
+                        TextButton(onClick = { dialogView = true }) {
+                            Text(text = device.value.deviceName)
+                        }
+                        IconButton(onClick = { viewModel.connectToDevice(device.value.deviceAddress) }) {
+                            Icon(modifier = Modifier.padding(0.dp), painter = painterResource(id = R.drawable.bluetooth), contentDescription = "Localized description")
+                        }
+                    }
+                )
+            },
+            content = { paddingValues ->
+                Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                    when (selectIndex) {
+                        0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
+                        1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
+                        2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
+                        3 -> NoneScreen()
+                    }
+                }
+            },
+            bottomBar = {
+                NavigationBar {
+                    bottomNavItemList.forEachIndexed { index, navigationItem ->
+                        NavigationBarItem(
+                            selected = selectIndex == index,
+                            icon = { Icon(imageVector = navigationItem.icon, "") },
+                            label = { Text(navigationItem.label) },
+                            onClick = { onSelectIndexChanged(index) }
+                        )
+                    }
+                }
+            }
+        )
+    }
+}
+
+// BluetoothControlViewModel 생성에 필요한 팩토리 클래스
+@Suppress("UNCHECKED_CAST")
+class BluetoothControlViewModelFactory(
+    private val context: Context
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return BluetoothControlViewModel(BluetoothControl(context)) as T
+    }
+}
+
+class NavigationItem(
+    val icon: ImageVector,
+    val label: String
+)
 
 val bottomNavItemList: List<NavigationItem> =
     listOf(
@@ -62,165 +224,3 @@ val bottomNavItemList: List<NavigationItem> =
             label = "프로 젝트"
         )
     )
-
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun HomeScreen(
-    navController : NavController,
-){
-
-    val windowSizeClass = calculateWindowSizeClass(LocalContext.current as Activity)
-    var selectIndex by remember { mutableIntStateOf(0) }
-    when (windowSizeClass.widthSizeClass) {
-        WindowWidthSizeClass.Compact -> BottomNavigationLayout(
-            selectIndex = selectIndex, navController, windowSizeClass){ newIndex ->
-            selectIndex = newIndex
-        }
-        WindowWidthSizeClass.Medium,
-        WindowWidthSizeClass.Expanded -> SideNavigationLayout(
-            selectIndex = selectIndex, navController, windowSizeClass){ newIndex ->
-            selectIndex = newIndex
-        }
-        else -> BottomNavigationLayout(
-            selectIndex = selectIndex, navController, windowSizeClass){ newIndex ->
-            selectIndex = newIndex
-        } // 기본값 처리
-    }
-
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BottomNavigationLayout(
-    selectIndex: Int,
-    navController: NavController,
-    windowSizeClass: WindowSizeClass,
-    onSelectIndexChanged: (Int) -> Unit,
-){
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "IOT Linker",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
-                        )
-                    }
-
-                }
-            )
-        },
-        content = {paddingValues -> // paddingValues 인수 추가
-            Column (modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-            ){
-                when(selectIndex){
-                    0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
-                    1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
-                    2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
-                    3 -> NoneScreen()
-                }
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                bottomNavItemList.forEachIndexed { index, navigationItem ->
-                    NavigationBarItem(
-                        selected = selectIndex == index,
-                        icon = { Icon(imageVector = navigationItem.icon, "")},
-                        label = { Text(navigationItem.label) },
-                        onClick = {
-                            onSelectIndexChanged(index)
-                        }
-                    )
-                }
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SideNavigationLayout(
-    selectIndex: Int,
-    navController: NavController,
-    windowSizeClass: WindowSizeClass,
-    onSelectIndexChanged: (Int) -> Unit
-){
-    Row {
-        // 사이드 네비게이션 바
-        NavigationRail {
-            Spacer(Modifier.padding(top = 70.dp))
-            bottomNavItemList.forEachIndexed { index, navigationItem ->
-                NavigationRailItem(
-                    selected = selectIndex == index,
-                    icon = { Icon(imageVector = navigationItem.icon, "") },
-                    label = { Text(navigationItem.label) },
-                    onClick = {
-                        onSelectIndexChanged(index)
-                    }
-                )
-                Spacer(Modifier.padding(top = 10.dp))
-            }
-        }
-        Box(modifier = Modifier.weight(1f)) {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                "Medium Top App Bar",
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        },
-                        actions = {
-                            IconButton(onClick = { /* do something */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Localized description"
-                                )
-                            }
-                            IconButton(onClick = { /* do something */ }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Menu,
-                                    contentDescription = "Localized description"
-                                )
-                            }
-
-                        }
-                    )
-                },
-                content = {paddingValues -> // paddingValues 인수 추가
-                    Column (modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                    ){
-                        when(selectIndex){
-                            0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
-                            1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
-                            2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
-                            3 -> NoneScreen()
-                        }
-                    }
-                }
-            )
-        }
-    }
-}
-
-class NavigationItem(
-    val icon: ImageVector,
-    val label: String
-)
