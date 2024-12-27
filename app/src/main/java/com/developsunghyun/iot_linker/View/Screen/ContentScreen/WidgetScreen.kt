@@ -40,7 +40,9 @@ fun ToolScreen(
             columns = GridCells.Adaptive(minSize = 110.dp)
         ) {
             items(widgetDataList) { widgetData -> // 데이터 객체를 변수명 'widgetData'로 사용
-                ItemLayout2(image =  widgetData.image, label = widgetData.label) // ItemLayout2에 'widgetData' 전달
+                ItemLayout2(image =  widgetData.image, label = widgetData.label) {
+                    navController.navigate(widgetData.screenName)
+                } // ItemLayout2에 'widgetData' 전달
             }
         }
 

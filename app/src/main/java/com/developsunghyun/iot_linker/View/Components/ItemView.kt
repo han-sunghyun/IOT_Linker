@@ -62,7 +62,8 @@ fun ItemLayout(modifier: Modifier = Modifier){
 fun ItemLayout2(
     modifier: Modifier = Modifier,
     image: Int,
-    label: String
+    label: String,
+    clickEvent: () -> Unit
 ){
     Surface(
         modifier = modifier
@@ -78,6 +79,7 @@ fun ItemLayout2(
                     .clip(CircleShape)
                     .clickable {
                         Log.d("LOG", "클릭")
+                        clickEvent()
                     },
                 painter = painterResource(id = image),
                 contentDescription = stringResource(id = R.string.app_name)

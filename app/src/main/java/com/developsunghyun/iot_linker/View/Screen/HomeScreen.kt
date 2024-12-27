@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -63,16 +64,18 @@ import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 @Composable
 fun HomeScreen(
     navController: NavController,
-    context: Context
+    context: Context,
+    viewModel: BluetoothControlViewModel
 ) {
     // BluetoothControlViewModel 초기화 (viewModel() 사용)
-    val bluetoothViewModel: BluetoothControlViewModel = viewModel(factory = BluetoothControlViewModelFactory(context))
+    val bluetoothViewModel: BluetoothControlViewModel = viewModel
 
     val windowSizeClass = calculateWindowSizeClass(LocalContext.current as Activity)
     var selectIndex by remember { mutableIntStateOf(0) }
 
     // 공통 레이아웃 처리 (BottomNavigation 또는 SideNavigation)
     NavigationLayout(
+        context = context,
         selectIndex = selectIndex,
         navController = navController,
         windowSizeClass = windowSizeClass,
@@ -85,6 +88,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationLayout(
+    context: Context,
     selectIndex: Int,
     navController: NavController,
     windowSizeClass: WindowSizeClass,
@@ -92,7 +96,10 @@ fun NavigationLayout(
     onSelectIndexChanged: (Int) -> Unit,
     isSideNavigation: Boolean // 사이드 네비게이션 여부
 ) {
+    val isBluetoothEnabled = viewModel.isBluetoothEnabled.collectAsState()
     val device = viewModel.deviceData.collectAsState()
+    val connectState = viewModel.connectState.collectAsState()
+
     var dialogView by remember { mutableStateOf(false) }
 
     // 다이얼로그 처리
@@ -100,6 +107,7 @@ fun NavigationLayout(
         viewModel.searchPairedDevices()
         MinimalDialog(viewModel) { dialogView = false }
     }
+
 
     if (isSideNavigation) {
         Row {
@@ -128,13 +136,28 @@ fun NavigationLayout(
                                     Text(text = device.value.deviceName)
                                 }
                                 IconButton(onClick = { viewModel.connectToDevice(device.value.deviceAddress) }) {
-                                    Icon(modifier = Modifier.padding(0.dp), painter = painterResource(id = R.drawable.bluetooth), contentDescription = "Localized description")
+                                    Icon(
+                                        modifier = Modifier.padding(0.dp),
+                                        painter =
+                                        if(isBluetoothEnabled.value){
+                                            painterResource(id = R.drawable.bluetooth_disabled)
+                                        }else{
+                                            if (connectState.value)
+                                            {
+                                                painterResource(id = R.drawable.bluetooth_connected)
+                                            }else{
+                                                painterResource(id = R.drawable.bluetooth)
+                                            }
+                                        },
+                                        contentDescription = "Localized description")
                                 }
                             }
                         )
                     },
                     content = { paddingValues ->
-                        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                        Column(modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)) {
                             when (selectIndex) {
                                 0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
                                 1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
@@ -158,14 +181,34 @@ fun NavigationLayout(
                         TextButton(onClick = { dialogView = true }) {
                             Text(text = device.value.deviceName)
                         }
-                        IconButton(onClick = { viewModel.connectToDevice(device.value.deviceAddress) }) {
-                            Icon(modifier = Modifier.padding(0.dp), painter = painterResource(id = R.drawable.bluetooth), contentDescription = "Localized description")
+                        IconButton(onClick =
+                        {
+                            viewModel.connectToDevice(device.value.deviceAddress)
+                        }
+                        )
+                        {
+                            Icon(
+                                modifier = Modifier.padding(0.dp),
+                                painter =
+                                if(isBluetoothEnabled.value){
+                                    painterResource(id = R.drawable.bluetooth_disabled)
+                                }else{
+                                    if (connectState.value)
+                                    {
+                                        painterResource(id = R.drawable.bluetooth_connected)
+                                    }else{
+                                        painterResource(id = R.drawable.bluetooth)
+                                    }
+                                },
+                                contentDescription = "Localized description")
                         }
                     }
                 )
             },
             content = { paddingValues ->
-                Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)) {
                     when (selectIndex) {
                         0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
                         1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)

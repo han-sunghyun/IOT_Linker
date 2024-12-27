@@ -22,16 +22,8 @@ fun SwitchWidget(
     stateSetStrList: String? = "false,true,false,true"
 ){
 
-    val labelList = if (labelStrList != null) {
-        labelStrList.split(",").toMutableList()
-    }else{
-        mutableListOf()
-    }
-    val stateSetList = if (stateSetStrList != null) {
-        stateSetStrList.split(",").toMutableList()
-    }else{
-        mutableListOf()
-    }
+    val labelList = labelStrList?.split(",")?.toMutableList() ?: mutableListOf()
+    val stateSetList = stateSetStrList?.split(",")?.toMutableList() ?: mutableListOf()
 
     Surface(
         modifier = Modifier
@@ -74,4 +66,10 @@ fun SwitchCell(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun SwitchWidgetSettingsView(){
+
 }

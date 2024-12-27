@@ -98,9 +98,9 @@ class BluetoothControl(context: Context) {
         private val mmOutStream: OutputStream? = socket?.outputStream
         private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
 
-        fun write(num: Int){
+        fun write(num: String){
             try {
-                mmOutStream?.write(num)
+                mmOutStream?.write(num.toByteArray())
                 Log.d("BluetoothStream", "데이터 전송 성공: $num")
             } catch (e: IOException) {
                 Log.e("BluetoothStream", "데이터 전송 실패", e)

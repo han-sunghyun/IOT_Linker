@@ -18,7 +18,7 @@ data class WidgetData(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var name: String,
-    var setIntData1: @Composable Int,
+    var setIntData1: Int,
     var setIntData2: Int,
     var setIntData3: Int,
     var setIntData4: Int,
