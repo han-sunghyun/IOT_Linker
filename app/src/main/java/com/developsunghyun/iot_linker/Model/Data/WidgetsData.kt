@@ -13,7 +13,7 @@ class WidgetsData(
 
 val widgetDataList: MutableList<WidgetsData> = mutableListOf(
     WidgetsData("ButtonWidgetScreen", "버튼", R.drawable.button),
-    WidgetsData("ButtonWidgetScreen", "스위치", R.drawable.widget_switch),
+    WidgetsData("SwitchWidgetScreen", "스위치", R.drawable.widget_switch),
     WidgetsData("ButtonWidgetScreen", "슬라이드 바", R.drawable.slidebar),
     WidgetsData("ButtonWidget", "패드", R.drawable.pad),
     WidgetsData("ButtonWidget", "텍스트", R.drawable.text),

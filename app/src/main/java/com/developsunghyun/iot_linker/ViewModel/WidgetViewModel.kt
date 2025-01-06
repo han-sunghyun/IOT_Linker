@@ -1,6 +1,5 @@
 package com.developsunghyun.iot_linker.ViewModel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,10 +19,13 @@ class WidgetViewModel() : ViewModel() {
     val setStrData4: StateFlow<String> = _setStrData4
 
 
-
+    private val _sandData1Enable = MutableStateFlow<String>("true")
+    val sandData1Enable: StateFlow<String> = _sandData1Enable
     private val _sandData1 = MutableStateFlow<String?>(null)
     val sandData1: StateFlow<String?> = _sandData1
 
+    private val _sandData2Enable = MutableStateFlow<String>("true")
+    val sandData2Enable: StateFlow<String> = _sandData2Enable
     private val _sandData2 = MutableStateFlow<String?>(null)
     val sandData2: StateFlow<String?> = _sandData2
 
@@ -38,11 +40,16 @@ class WidgetViewModel() : ViewModel() {
     }
 
 
-
+    fun sandData1Enable(state: String){
+        _sandData1Enable.value = state
+    }
     fun sandData1(str: String){
         _sandData1.value = str
     }
 
+    fun sandData2Enable(state: String){
+        _sandData2Enable.value = state
+    }
     fun sandData2(str: String){
         _sandData2.value = str
     }

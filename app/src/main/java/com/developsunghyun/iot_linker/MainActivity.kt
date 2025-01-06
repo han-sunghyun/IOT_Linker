@@ -31,6 +31,7 @@ import com.developsunghyun.iot_linker.View.Screen.LayoutCompositionView
 import com.developsunghyun.iot_linker.View.Screen.LayoutSelect
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidgetScreen
+import com.developsunghyun.iot_linker.View.Widget.SwitchWidgetScreen
 import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 import com.developsunghyun.iot_linker.ui.theme.IOT_LinkerTheme
 import kotlin.concurrent.thread
@@ -70,9 +71,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     composable("HomeScreen") { HomeScreen(navController, applicationContext, bluetoothViewModel) }
                     composable("LayoutSelect") { LayoutSelect(navController = navController) }
-                    composable("LayoutCompositionView") { LayoutCompositionView(navController = navController) }
+                    composable("LayoutCompositionView") { LayoutCompositionView(navController = navController, bluetoothViewModel = bluetoothViewModel) }
 
                     composable("ButtonWidgetScreen") { ButtonWidgetScreen(bluetoothViewModel) }
+                    composable("SwitchWidgetScreen") { SwitchWidgetScreen(bluetoothViewModel) }
                 }
 
             }

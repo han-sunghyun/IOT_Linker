@@ -8,8 +8,10 @@ import com.developsunghyun.iot_linker.View.Layout.Layout_3Slot_1
 import com.developsunghyun.iot_linker.View.Layout.Layout_3Slot_2
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 import com.developsunghyun.iot_linker.View.Widget.SwitchWidget
+import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 
 class LayoutPrint(
+    bluetoothViewModel: BluetoothControlViewModel,
     var layout: String,
     var module: MutableList<String>,
     var setStrData1: MutableList<String>,//0 ~ 5
@@ -17,8 +19,8 @@ class LayoutPrint(
 ) {
     private var widgetList: List<Map<String, @Composable () -> Unit>> = List(6) { index ->
         mapOf(
-            "ButtonWidget" to { ButtonWidget(labelStrList = setStrData1[index], positionStrList = setStrData2[index]) },
-            "SwitchWidget" to { SwitchWidget(labelStrList = setStrData1[index], stateSetStrList = setStrData2[index]) }
+            "ButtonWidget" to { ButtonWidget(bluetoothViewModel = bluetoothViewModel, labelStrList = setStrData1.joinToString(",")) },
+            "SwitchWidget" to { SwitchWidget(bluetoothViewModel = bluetoothViewModel, labelStrList = setStrData1.joinToString(",")) }
         )
     }
 

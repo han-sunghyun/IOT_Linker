@@ -53,15 +53,15 @@ fun TestView(){
         imageButtonEnableList = listOf(imageButton[0], imageButton[1], imageButton[2]),
         imageButtonClickList = listOf({imageButton[0] = !imageButton[0]}, {imageButton[1] = !imageButton[1]}, {imageButton[2] = !imageButton[2]}),
 
-        dataWriteTextList = listOf("data1", "data1"),
+        dataWriteTextList = listOf("write1", "write2"),
         dataWriteHintList = listOf("write1", "write2"),
         dataWriteFieldList = listOf({}, {}),
         dataWriteCheckList = listOf(false, true),
         dataWriteCheckBoxList = listOf({}, {}),
         guideWriteTextList = listOf("가이드"),
 
-        dataReadTextList = listOf("data1", "data1"),
-        dataReadHintList = listOf("write1", "write2"),
+        dataReadTextList = listOf("read1", "read2"),
+        dataReadHintList = listOf("read1", "read2"),
         dataReadFieldList = listOf({}, {}),
         guideReadTextList = listOf("가이드")
     )
@@ -95,7 +95,6 @@ fun WidgetSettingsView(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
         Surface(
@@ -189,22 +188,22 @@ fun WidgetSettingsView(
                 //==========
 
                 if(dataWriteFieldList != null && dataWriteTextList != null &&
-                    dataWriteHintList != null && dataWriteCheckBoxList != null &&
-                    dataWriteCheckList != null){
+                    dataWriteHintList != null){
 
                     if((dataWriteTextList.size == dataWriteHintList.size) &&
-                        (dataWriteTextList.size == dataWriteFieldList.size) &&
-                        (dataWriteTextList.size == dataWriteCheckList.size) &&
-                        (dataWriteTextList.size == dataWriteCheckBoxList.size)){
+                        (dataWriteTextList.size == dataWriteFieldList.size)){
 
                         Column {
                             for(index in dataWriteTextList.indices){
                                 Column (
                                 ) {
-                                    Checkbox(
-                                        checked = dataWriteCheckList[index],
-                                        onCheckedChange = { dataWriteCheckBoxList[index](it) }
-                                    )
+                                    if(dataWriteCheckList != null) {
+                                        Checkbox(
+                                            checked = dataWriteCheckList[index],
+                                            onCheckedChange = { dataWriteCheckBoxList?.get(index)
+                                                ?.let { it1 -> it1(it) } }
+                                        )
+                                    }
                                     Row(
                                         verticalAlignment = Alignment.Bottom
                                     ) {
@@ -214,7 +213,12 @@ fun WidgetSettingsView(
                                             value = dataWriteTextList[index],
                                             onValueChange = { dataWriteFieldList[index](it) },
                                             label = { Text(text = dataWriteHintList[index]) },
-                                            enabled = dataWriteCheckList[index],
+                                            enabled = if(dataWriteCheckList != null){
+                                                dataWriteCheckList[index]
+                                            }else{
+                                                true
+                                            }
+
                                         )
                                         if(guideWriteTextList != null){
                                             IconButton(
