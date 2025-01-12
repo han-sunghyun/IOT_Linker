@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -26,8 +27,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,15 +42,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.R
 import com.developsunghyun.iot_linker.View.Components.WidgetSettingsView
+import com.developsunghyun.iot_linker.View.Screen.bitmapToByteArray
 import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 import com.developsunghyun.iot_linker.ViewModel.WidgetViewModel
+import kotlinx.coroutines.launch
+import android.graphics.Bitmap
+import android.util.Base64
+import androidx.compose.ui.Alignment
+import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ButtonWidgetScreen(
+    database: LocalDataRepository,
     bluetoothViewModel: BluetoothControlViewModel
 ){
     val viewModel: WidgetViewModel = viewModel()
@@ -51,13 +66,15 @@ fun ButtonWidgetScreen(
     val setStrData1 = viewModel.setStrData1.collectAsState()
     val setStrData2 = viewModel.setStrData2.collectAsState()
 
+    val writeData1Enable = viewModel.writeData1Enable.collectAsState()
+    val writeData1 = viewModel.writeData1.collectAsState()
 
-    val writeData1Enable = viewModel.sandData1Enable.collectAsState()
-    val writeData1 = viewModel.sandData1.collectAsState()
+    val writeData2Enable = viewModel.writeData2Enable.collectAsState()
+    val writeData2 = viewModel.writeData2.collectAsState()
 
-    val writeData2Enable = viewModel.sandData2Enable.collectAsState()
-    val writeData2 = viewModel.sandData2.collectAsState()
-
+    val coroutineScope = rememberCoroutineScope()
+    val graphicsLayer = rememberGraphicsLayer()
+    var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
     Scaffold(
         topBar = {
@@ -66,6 +83,33 @@ fun ButtonWidgetScreen(
                     Text("버튼",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            //LayoutBitmapCapture()
+                            coroutineScope.launch {
+                                bitmap = graphicsLayer.toImageBitmap()
+                                val bitmapByteArray = bitmapToByteArray(bitmap!!.asAndroidBitmap())
+                                Log.d("bitmap", bitmapByteArray.size.toString())
+
+                                database.widgetDataInsert(
+                                    name = "testName",
+                                    widgetType = "ButtonWidget",
+                                    image = Base64.encodeToString(bitmapByteArray, Base64.DEFAULT),
+                                    setStrData1 = setStrData1.value!!,
+                                    setStrData2 = setStrData2.value!!,
+                                    writeData1Enable = writeData1Enable.value,
+                                    writeData1 = writeData1.value!!,
+                                    writeData2Enable = writeData2Enable.value,
+                                    writeData2 = writeData2.value!!,
+                                )
+                            }
+
+                        }
+                    ) {
+
+                    }
                 }
             )
         },
@@ -77,7 +121,16 @@ fun ButtonWidgetScreen(
                 ButtonWidget(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .drawWithContent {
+                            // call record to capture the content in the graphics layer
+                            graphicsLayer.record {
+                                // draw the contents of the composable into the graphics layer
+                                this@drawWithContent.drawContent()
+                            }
+                            // draw the graphics layer on the visible canvas
+                            drawLayer(graphicsLayer)
+                        },
                     bluetoothViewModel = bluetoothViewModel,
                     labelStrList = setStrData1.value.toString(),
                     positionStrList = setStrData2.value.toString(),
@@ -122,17 +175,22 @@ fun ButtonWidget(
     Surface(
         modifier = modifier
     ) {
-        LazyColumn {
-            items(labelList.size){ index ->
-                ButtonCell(
-                    bluetoothViewModel,
-                    label = labelList[index],
-                    position = positionList[index].toIntOrNull() ?: 0,
-                    writeDataEnableList1[index],
-                    writeDataList1[index],
-                    writeDataEnableList2[index],
-                    writeDataList2[index]
-                )
+        Box(
+            modifier = Modifier,
+            contentAlignment = Alignment.Center
+        ){
+            LazyColumn {
+                items(labelList.size){ index ->
+                    ButtonCell(
+                        bluetoothViewModel,
+                        label = labelList[index],
+                        position = positionList[index].toIntOrNull() ?: 0,
+                        writeDataEnableList1[index],
+                        writeDataList1[index],
+                        writeDataEnableList2[index],
+                        writeDataList2[index]
+                    )
+                }
             }
         }
 
@@ -229,11 +287,11 @@ fun ButtonWidgetSettings(
     viewModel.setStrData1(labelStrData.joinToString(",") )
     viewModel.setStrData2(positionStrData.joinToString(",") )
 
-    viewModel.sandData1Enable(pushEnableData.joinToString(","))
-    viewModel.sandData1(pushData.joinToString(",") )
+    viewModel.writeData1Enable(pushEnableData.joinToString(","))
+    viewModel.writeData1(pushData.joinToString(",") )
 
-    viewModel.sandData2Enable(upEnableData.joinToString(","))
-    viewModel.sandData2(upData.joinToString(",") )
+    viewModel.writeData2Enable(upEnableData.joinToString(","))
+    viewModel.writeData2(upData.joinToString(",") )
 
     if(buttonWidgetDataList.size <= 0){
         buttonWidgetDataList.add(

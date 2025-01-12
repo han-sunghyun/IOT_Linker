@@ -12,19 +12,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.developsunghyun.iot_linker.Model.Data.BluetoothDeviceData
 import com.developsunghyun.iot_linker.View.PermissionManager
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
 import kotlin.concurrent.thread
 
+const val MESSAGE_READ: Int = 0
+const val MESSAGE_WRITE: Int = 1
+const val MESSAGE_TOAST: Int = 2
+
 class BluetoothControl(context: Context) {
+    private val dataChannel = Channel<String>(Channel.BUFFERED)
+    val receivedDataFlow = dataChannel.receiveAsFlow()
+
     private val myContext = context
     private val bluetoothManager: BluetoothManager = myContext.getSystemService(BluetoothManager::class.java)
     private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
@@ -93,10 +103,30 @@ class BluetoothControl(context: Context) {
 
     inner class IOStream(
         socket: BluetoothSocket?
-    ){
+    ) : Thread(){
+
+
         private val mmInStream: InputStream? = socket?.inputStream
         private val mmOutStream: OutputStream? = socket?.outputStream
         private val mmBuffer: ByteArray = ByteArray(1024) // mmBuffer store for the stream
+
+        override fun run() {
+            var numBytes: Int
+            var receivedMessage: String
+
+            while (true) {
+                try {
+                    numBytes = mmInStream!!.read(mmBuffer)
+                    receivedMessage = String(mmBuffer, 0, numBytes)
+                    // 데이터를 Channel에 전송
+                    dataChannel.trySend(receivedMessage)
+                    Log.d("TAG", "블루투스 데이터 입력")
+                } catch (e: IOException) {
+                    Log.d("TAG", "Input stream was disconnected", e)
+                    break
+                }
+            }
+        }
 
         fun write(num: String){
             try {

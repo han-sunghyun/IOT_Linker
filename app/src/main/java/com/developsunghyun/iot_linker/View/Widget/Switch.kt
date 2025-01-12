@@ -1,9 +1,11 @@
 package com.developsunghyun.iot_linker.View.Widget
 
 import android.annotation.SuppressLint
+import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,45 +18,63 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.R
 import com.developsunghyun.iot_linker.View.Components.WidgetSettingsView
+import com.developsunghyun.iot_linker.View.Screen.bitmapToByteArray
 import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 import com.developsunghyun.iot_linker.ViewModel.WidgetViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SwitchWidgetScreen(
+    database: LocalDataRepository,
     bluetoothViewModel: BluetoothControlViewModel
 ){
     val viewModel: WidgetViewModel = viewModel()
 
     val setStrData1 = viewModel.setStrData1.collectAsState()
 
-    val writeData1 = viewModel.sandData1.collectAsState()
-    val writeData2 = viewModel.sandData2.collectAsState()
+    val writeData1 = viewModel.writeData1.collectAsState()
+    val writeData2 = viewModel.writeData2.collectAsState()
 
+    val readData1 = viewModel.readData1.collectAsState()
+    val readData2 = viewModel.readData2.collectAsState()
+
+    val coroutineScope = rememberCoroutineScope()
+    val graphicsLayer = rememberGraphicsLayer()
+    var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
     Scaffold(
         topBar = {
@@ -63,6 +83,32 @@ fun SwitchWidgetScreen(
                     Text("버튼",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            //LayoutBitmapCapture()
+                            coroutineScope.launch {
+                                bitmap = graphicsLayer.toImageBitmap()
+                                val bitmapByteArray = bitmapToByteArray(bitmap!!.asAndroidBitmap())
+                                Log.d("bitmap", bitmapByteArray.size.toString())
+
+                                database.widgetDataInsert(
+                                    name = "SwitchWidget_Name",
+                                    widgetType = "SwitchWidget",
+                                    image = Base64.encodeToString(bitmapByteArray, Base64.DEFAULT),
+                                    setStrData1 = setStrData1.value!!,
+                                    writeData1 = writeData1.value!!,
+                                    writeData2 = writeData2.value!!,
+                                    readData1 = readData1.value!!,
+                                    readData2 = readData2.value!!
+                                )
+                            }
+
+                        }
+                    ) {
+
+                    }
                 }
             )
         },
@@ -74,13 +120,23 @@ fun SwitchWidgetScreen(
                 SwitchWidget(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f),
+                        .weight(1f)
+                        .drawWithContent {
+                            // call record to capture the content in the graphics layer
+                            graphicsLayer.record {
+                                // draw the contents of the composable into the graphics layer
+                                this@drawWithContent.drawContent()
+                            }
+                            // draw the graphics layer on the visible canvas
+                            drawLayer(graphicsLayer)
+                        },
                     bluetoothViewModel = bluetoothViewModel,
                     labelStrList = setStrData1.value.toString(),
 
-                    writeData1List = writeData1.value.toString(),
-                    writeData2List = writeData2.value.toString(),
-
+                    writeDataStrList1 = writeData1.value.toString(),
+                    writeDataStrList2 = writeData2.value.toString(),
+                    readDataStrList1 = readData1.value.toString(),
+                    readDataStrList2 = readData2.value.toString(),
                 )
                 SwitchWidgetSettings(
                     modifier = Modifier
@@ -97,29 +153,40 @@ fun SwitchWidget(
     modifier: Modifier = Modifier,
     bluetoothViewModel: BluetoothControlViewModel = viewModel(),
     labelStrList: String? = "Switch1,a,v,3.14",
-    writeData1List: String? = "false,true,false,true",
-    writeData2List: String? = "false,true,false,true"
+    writeDataStrList1: String? = "false,true,false,true",
+    writeDataStrList2: String? = "false,true,false,true",
+    readDataStrList1: String? = "a1,a2,a3,a4",
+    readDataStrList2: String? = "b1,b2,b3,b4",
 ){
 
     val labelList = labelStrList?.split(",")?.toMutableList() ?: mutableListOf()
-    val switchOnWriteList = writeData1List?.split(",")?.toMutableList() ?: mutableListOf()
-    val switchOffWriteList = writeData2List?.split(",")?.toMutableList() ?: mutableListOf()
+    val switchOnWriteList = writeDataStrList1?.split(",")?.toMutableList() ?: mutableListOf()
+    val switchOffWriteList = writeDataStrList2?.split(",")?.toMutableList() ?: mutableListOf()
+    val switchOnReadList = readDataStrList1?.split(",")?.toMutableList() ?: mutableListOf()
+    val switchOffReadList = readDataStrList2?.split(",")?.toMutableList() ?: mutableListOf()
 
     Surface(
         modifier = modifier
     ) {
         val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .verticalScroll(scrollState),
+        Box(
+            modifier = Modifier,
+            contentAlignment = Alignment.Center
         ) {
-            labelList.forEachIndexed { index, s ->
-                SwitchCell(
-                    bluetoothViewModel,
-                    label = labelList[index],
-                    on = switchOnWriteList[index].toString(),
-                    off = switchOffWriteList[index].toString()
-                )
+            Column(
+                modifier = Modifier
+                    .verticalScroll(scrollState),
+            ) {
+                labelList.forEachIndexed { index, s ->
+                    SwitchCell(
+                        bluetoothViewModel,
+                        label = labelList[index],
+                        onWriteData = switchOnWriteList[index].toString(),
+                        offWriteData = switchOffWriteList[index].toString(),
+                        switchOnRead = switchOnReadList[index],
+                        switchOffRead = switchOffReadList[index],
+                    )
+                }
             }
         }
 
@@ -130,11 +197,22 @@ fun SwitchWidget(
 fun SwitchCell(
     bluetoothViewModel: BluetoothControlViewModel = viewModel(),
     label: String,
-    on: String,
-    off: String,
+    onWriteData: String,
+    offWriteData: String,
+    switchOnRead: String,
+    switchOffRead: String
 ){
     var switchState by remember { mutableStateOf(true) }
 
+    val readData by bluetoothViewModel.readData.collectAsState()
+
+    LaunchedEffect(readData) {
+        switchState = when (readData) {
+            switchOnRead -> true
+            switchOffRead -> false
+            else -> switchState // 상태를 유지
+        }
+    }
 
     Surface(
         modifier = Modifier
@@ -156,8 +234,8 @@ fun SwitchCell(
                 modifier = Modifier,
                 onCheckedChange = {
                     switchState = it
-                    if(switchState) bluetoothViewModel.writeData(on)
-                    else bluetoothViewModel.writeData(off)
+                    if(switchState) bluetoothViewModel.writeData(onWriteData)
+                    else bluetoothViewModel.writeData(offWriteData)
                                   },
                 checked = switchState
             )
@@ -176,26 +254,33 @@ fun SwitchWidgetSettings(
 
     val labelStrData = remember { mutableStateListOf("") }
 
-    val switchOnData = remember { mutableStateListOf("") }
-    val switchOffData = remember { mutableStateListOf("") }
+    val switchOnWriteData = remember { mutableStateListOf("") }
+    val switchOffWriteData = remember { mutableStateListOf("") }
+
+    val switchOnReadData = remember { mutableStateListOf("") }
+    val switchOffReadData = remember { mutableStateListOf("") }
 
     viewModel.setStrData1(labelStrData.joinToString(",") )
 
-    viewModel.sandData1(switchOnData.joinToString(",") )
-    viewModel.sandData2(switchOffData.joinToString(",") )
+    viewModel.writeData1(switchOnWriteData.joinToString(",") )
+    viewModel.writeData2(switchOffWriteData.joinToString(",") )
+
+    viewModel.readData1(switchOnReadData.joinToString(",") )
+    viewModel.readData2(switchOffReadData.joinToString(",") )
 
 
     if(switchWidgetDataList.size <= 0){
         switchWidgetDataList.add(
-            SwitchWidgetData("", "", "")
+            SwitchWidgetData("", "", "", "", "")
         )
     }
 
     switchWidgetDataList.forEachIndexed{ index, data ->
         labelStrData[index] = data.label
-        switchOnData[index] = data.switchOn
-        switchOffData[index] = data.switchOff
-
+        switchOnWriteData[index] = data.switchOnWrite
+        switchOffWriteData[index] = data.switchOffWrite
+        switchOnReadData[index] = data.switchOnRead
+        switchOffReadData[index] = data.switchOffRead
     }
     Column(
         modifier = modifier
@@ -211,8 +296,10 @@ fun SwitchWidgetSettings(
                     SwitchWidgetData("", "", "")
                 )
                     labelStrData.add("")
-                    switchOnData.add("")
-                    switchOffData.add("")
+                    switchOnWriteData.add("")
+                    switchOffWriteData.add("")
+                    switchOnReadData.add("")
+                    switchOffReadData.add("")
                     thisNumber.intValue = switchWidgetDataList.size - 1
                 }
             }
@@ -224,15 +311,25 @@ fun SwitchWidgetSettings(
             parametersFieldList = listOf(){text -> switchWidgetDataList[thisNumber.intValue].label = text},
 
             dataWriteTextList = listOf(
-                switchWidgetDataList[thisNumber.intValue].switchOn,
-                switchWidgetDataList[thisNumber.intValue].switchOff),
+                switchWidgetDataList[thisNumber.intValue].switchOnWrite,
+                switchWidgetDataList[thisNumber.intValue].switchOffWrite),
             dataWriteHintList = listOf("write1", "write2"),
             dataWriteFieldList = listOf(
-                {text -> switchWidgetDataList[thisNumber.intValue].switchOn = text},
-                {text -> switchWidgetDataList[thisNumber.intValue].switchOff = text}
+                {text -> switchWidgetDataList[thisNumber.intValue].switchOnWrite = text},
+                {text -> switchWidgetDataList[thisNumber.intValue].switchOffWrite = text}
             ),
 
             guideWriteTextList = listOf("가이드", "1"),
+
+            dataReadTextList = listOf(
+                switchWidgetDataList[thisNumber.intValue].switchOnRead,
+                switchWidgetDataList[thisNumber.intValue].switchOffRead,),
+            dataReadHintList = listOf("read1", "read2"),
+            dataReadFieldList = listOf(
+                {text -> switchWidgetDataList[thisNumber.intValue].switchOnRead = text},
+                {text -> switchWidgetDataList[thisNumber.intValue].switchOffRead = text},
+            ),
+            guideReadTextList = listOf("가이드", "1"),
         )
 
     }
@@ -242,11 +339,16 @@ fun SwitchWidgetSettings(
 class SwitchWidgetData(
     label: String = "",
 
-    switchOn: String = "",
-    switchOff: String = "",
+    switchOnWrite: String = "",
+    switchOffWrite: String = "",
+
+    switchOnRead: String = "",
+    switchOffRead: String = "",
 ){
     var label by mutableStateOf(label)
-    var switchOn by mutableStateOf(switchOn)
-    var switchOff by mutableStateOf(switchOff)
+    var switchOnWrite by mutableStateOf(switchOnWrite)
+    var switchOffWrite by mutableStateOf(switchOffWrite)
+    var switchOnRead by mutableStateOf(switchOnRead)
+    var switchOffRead by mutableStateOf(switchOffRead)
 
 }

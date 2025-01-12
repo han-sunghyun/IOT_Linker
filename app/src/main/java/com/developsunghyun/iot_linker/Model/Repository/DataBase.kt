@@ -11,7 +11,7 @@ import com.developsunghyun.iot_linker.Model.Data.ItemDao
 import com.developsunghyun.iot_linker.Model.Data.WidgetData
 import java.util.concurrent.Executors
 
-@Database(entities = [DBItemData::class, WidgetData::class], version = 1, exportSchema = false)
+@Database(entities = [DBItemData::class, WidgetData::class], version = 3, exportSchema = false)
 abstract class DataBase : RoomDatabase() {
 
     abstract fun dbItemDao(): ItemDao

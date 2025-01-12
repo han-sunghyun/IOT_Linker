@@ -1,5 +1,6 @@
 package com.developsunghyun.iot_linker.View.Components
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,16 +19,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.developsunghyun.iot_linker.R
 
-@Preview(showBackground = true)
 @Composable
-fun ItemLayout(modifier: Modifier = Modifier){
+fun ItemLayout(
+    modifier: Modifier = Modifier,
+    image: ImageBitmap,
+    label: String,
+    clickEvent: () -> Unit
+){
     Surface(
         modifier = modifier
             .wrapContentSize()
@@ -39,17 +45,19 @@ fun ItemLayout(modifier: Modifier = Modifier){
         Column(
             modifier = Modifier
                 .clickable {
-                    Log.d("LOG", "클릭")
+                    clickEvent()
                 }
         ) {
             Image(
                 modifier = Modifier
-                    .aspectRatio(1f),
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = stringResource(id = R.string.app_name)
+                    .fillMaxWidth() // 부모 레이아웃의 너비에 맞춤
+                    .aspectRatio(1f), // 1:1 비율 유지
+                bitmap = image,
+                contentDescription = "Displayed Image",
+                contentScale = ContentScale.Crop // 이미지 크기 조정 방식 (예: Crop, Fit, FillBounds 등)
             )
             Text(
-                text = "Name",
+                text = label,
                 fontSize = 14.sp,
                 modifier = Modifier
                     .padding(start = 8.dp, top = 2.dp, bottom = 2.dp)

@@ -30,6 +30,9 @@ class BluetoothControlViewModel(private val bluetoothControl: BluetoothControl) 
     private val _connectState = MutableStateFlow(false)
     val connectState: StateFlow<Boolean> = _connectState
 
+    private val _readData = MutableStateFlow("")
+    val readData: StateFlow<String> = _readData
+
     // 블루투스 상태 업데이트
     fun updateBluetoothStatus() {
         _isBluetoothEnabled.value = bluetoothControl.checkBluetoothEnabled()
@@ -50,6 +53,8 @@ class BluetoothControlViewModel(private val bluetoothControl: BluetoothControl) 
             }
             if (bluetoothSocket != null) {
                 _connectState.value = bluetoothSocket!!.isConnected
+                bluetoothControl.IOStream(bluetoothSocket).start()
+                readData()
             }
 
         }
@@ -70,4 +75,13 @@ class BluetoothControlViewModel(private val bluetoothControl: BluetoothControl) 
         Log.d("LOG", "출력: $str")
         bluetoothControl.IOStream(bluetoothSocket).write(str)
     }
+    private fun readData() {
+        viewModelScope.launch {
+            bluetoothControl.receivedDataFlow.collect { data ->
+                _readData.value = data.trim().toByteArray(Charsets.UTF_8).toString(Charsets.UTF_8) // 데이터를 UI로 전달
+                Log.d("TAG", data)
+            }
+        }
+    }
+
 }

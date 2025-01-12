@@ -50,6 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.developsunghyun.iot_linker.Model.Data.BluetoothDeviceData
 import com.developsunghyun.iot_linker.Model.Repository.BluetoothControl
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.R
 import com.developsunghyun.iot_linker.View.Components.MinimalDialog
 import com.developsunghyun.iot_linker.View.Screen.ContentScreen.InterfaceScreen
@@ -65,7 +66,8 @@ import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 fun HomeScreen(
     navController: NavController,
     context: Context,
-    viewModel: BluetoothControlViewModel
+    viewModel: BluetoothControlViewModel,
+    database: LocalDataRepository,
 ) {
     // BluetoothControlViewModel 초기화 (viewModel() 사용)
     val bluetoothViewModel: BluetoothControlViewModel = viewModel
@@ -81,7 +83,8 @@ fun HomeScreen(
         windowSizeClass = windowSizeClass,
         viewModel = bluetoothViewModel,
         onSelectIndexChanged = { newIndex -> selectIndex = newIndex },
-        isSideNavigation = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact
+        isSideNavigation = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact,
+        database = database,
     )
 }
 
@@ -94,7 +97,8 @@ fun NavigationLayout(
     windowSizeClass: WindowSizeClass,
     viewModel: BluetoothControlViewModel,
     onSelectIndexChanged: (Int) -> Unit,
-    isSideNavigation: Boolean // 사이드 네비게이션 여부
+    isSideNavigation: Boolean, // 사이드 네비게이션 여부
+    database: LocalDataRepository,
 ) {
     val isBluetoothEnabled = viewModel.isBluetoothEnabled.collectAsState()
     val device = viewModel.deviceData.collectAsState()
@@ -160,7 +164,7 @@ fun NavigationLayout(
                             .padding(paddingValues)) {
                             when (selectIndex) {
                                 0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
-                                1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
+                                1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass, database = database)
                                 2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
                                 3 -> NoneScreen()
                             }
@@ -211,7 +215,7 @@ fun NavigationLayout(
                     .padding(paddingValues)) {
                     when (selectIndex) {
                         0 -> InterfaceScreen(navController, windowSizeClass.widthSizeClass)
-                        1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass)
+                        1 -> ModuleScreen(navController, windowSizeClass.widthSizeClass, database = database)
                         2 -> ToolScreen(navController, windowSizeClass.widthSizeClass)
                         3 -> NoneScreen()
                     }

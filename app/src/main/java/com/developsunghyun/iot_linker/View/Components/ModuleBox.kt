@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 @Preview
 @Composable
 fun SlotBox(
-    module: @Composable () -> Unit = { NoneModule(text = "빈 슬롯") },
+    module: @Composable () -> Unit = {  },
     slotNumber: Int = 0
 ){
     Surface(
@@ -61,6 +61,7 @@ fun SlotBox(
 @Preview
 @Composable
 fun NoneModule(
+
     text: String = ""
 ){
     Box(

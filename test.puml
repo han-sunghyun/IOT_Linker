@@ -1,14 +1,34 @@
 @startuml
+class com.developsunghyun.iot_linker.View.PermissionManager {
+-  myContext
++ Boolean checkPermission(String)
++ void requestPermission(String,Int)
+- void openAppSettings()
+}
+
+
+class com.developsunghyun.iot_linker.View.InterfaceLayout {
+- List<Map<String, @Composable () -> Unit>> widget
+- Map<String, @Composable () -> Unit> slot
++ void null()
++ void null()
++ void null()
++ void Layout()
+}
+
+
 class com.developsunghyun.iot_linker.Model.Data.DBItemData {
 }
 class com.developsunghyun.iot_linker.Model.Data.WidgetData {
 }
+class com.developsunghyun.iot_linker.Model.Data.BluetoothDeviceData {
+}
 interface com.developsunghyun.iot_linker.Model.Data.ItemDao {
-+ void insert(DBItemData)
-+ void update(DBItemData)
-+ void delete(DBItemData)
-+ Flow<DBItemData> getItem(Int)
-+ Flow<List<DBItemData>> getAllItems()
++ void insert(WidgetData)
++ void update(WidgetData)
++ void delete(WidgetData)
++ Flow<WidgetData> getItem()
++ Flow<List<WidgetData>> getAllItems()
 }
 
 class com.developsunghyun.iot_linker.View.LayoutPrint {
@@ -23,8 +43,6 @@ class com.developsunghyun.iot_linker.View.LayoutPrint {
 }
 
 
-class com.developsunghyun.iot_linker.Model.Data.InterfaceLayoutData {
-}
 class com.developsunghyun.iot_linker.Model.Repository.DataBase$Companion {
 - DataBase? Instance
 + DataBase getDatabase(Context)
@@ -41,6 +59,26 @@ class com.developsunghyun.iot_linker.MainActivity {
 
 class com.developsunghyun.iot_linker.Model.Data.WidgetsData {
 }
+class com.developsunghyun.iot_linker.Model.Repository.BluetoothControl$IOStream {
+}
+class com.developsunghyun.iot_linker.Model.Repository.BluetoothControl {
+-  dataChannel
++  receivedDataFlow
+-  myContext
+- BluetoothManager bluetoothManager
+- BluetoothAdapter? bluetoothAdapter
+- UUID sppUuid
+-  permission
+-  bluetoothStateReceiver
++ Boolean checkBluetoothSupport()
++ Boolean checkBluetoothEnabled()
++ List<BluetoothDeviceData> pairedDevicesSearch()
++ BluetoothSocket? connect(String)
++ void disconnect(BluetoothSocket?)
++ void null()
+}
+
+
 class com.developsunghyun.iot_linker.ViewModel.CreateViewModel {
 -  _layoutData
 + State<LayoutItem> layoutData
@@ -51,19 +89,95 @@ class com.developsunghyun.iot_linker.ViewModel.CreateViewModel {
 
 
 class com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository {
-+  dbContext
-+  dao
-+ void testInsert()
-+ LiveData<DBItemData> getData()
+-  dbContext
+-  dao
++ void widgetDataInsert(void,String,void,String,void,String,void)
++ void null()
++ LiveData<List<WidgetData>> getListData()
 }
 
 
+class com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel {
+- BluetoothSocket? bluetoothSocket
+-  _isBluetoothEnabled
++ StateFlow<Boolean> isBluetoothEnabled
+-  _pairedDevices
++ StateFlow<List<BluetoothDeviceData>> pairedDevices
+-  _deviceData
++ StateFlow<BluetoothDeviceData> deviceData
+-  _connectState
++ StateFlow<Boolean> connectState
+-  _readData
++ StateFlow<String> readData
++ void updateBluetoothStatus()
++ void searchPairedDevices()
++ void connectToDevice(String)
++ void setDeviceData(String,String)
++ void disconnectDevice(BluetoothSocket?)
++ void writeData(String)
+- void readData()
+}
+
+
+class com.developsunghyun.iot_linker.View.Widget.ButtonWidgetData {
++  label
++  position
++  pushEnable
++  push
++  upEnable
++  up
+}
+
+class com.developsunghyun.iot_linker.View.Widget.SwitchWidgetData {
++  label
++  switchOnWrite
++  switchOffWrite
++  switchOnRead
++  switchOffRead
+}
+
+class com.developsunghyun.iot_linker.Model.Data.InterfaceLayoutData {
+}
 class com.developsunghyun.iot_linker.Model.Data.LayoutDataList {
-+ List<InterfaceLayoutData> layoutListData
++ List<List<InterfaceLayoutData>> layoutListData
 }
 
+class com.developsunghyun.iot_linker.View.Screen.BluetoothControlViewModelFactory {
+}
 class com.developsunghyun.iot_linker.View.Screen.NavigationItem {
 }
+class com.developsunghyun.iot_linker.ViewModel.WidgetViewModel {
+-  _setStrData1
++ StateFlow<String?> setStrData1
+-  _setStrData2
++ StateFlow<String?> setStrData2
+-  _setStrData3
++ StateFlow<String> setStrData3
+-  _setStrData4
++ StateFlow<String> setStrData4
+-  _writeData1Enable
++ StateFlow<String> writeData1Enable
+-  _writeData1
++ StateFlow<String?> writeData1
+-  _writeData2Enable
++ StateFlow<String> writeData2Enable
+-  _writeData2
++ StateFlow<String?> writeData2
+-  _readData1
++ StateFlow<String?> readData1
+-  _readData2
++ StateFlow<String?> readData2
++ void setStrData1(String)
++ void setStrData2(String)
++ void writeData1Enable(String)
++ void writeData1(String)
++ void writeData2Enable(String)
++ void writeData2(String)
++ void readData1(String)
++ void readData2(String)
+}
+
+
 class com.developsunghyun.iot_linker.Model.Data.LayoutItem {
 }
 
@@ -71,5 +185,8 @@ class com.developsunghyun.iot_linker.Model.Data.LayoutItem {
 com.developsunghyun.iot_linker.Model.Repository.DataBase +.. com.developsunghyun.iot_linker.Model.Repository.DataBase$Companion
 androidx.room.RoomDatabase <|-- com.developsunghyun.iot_linker.Model.Repository.DataBase
 androidx.activity.ComponentActivity <|-- com.developsunghyun.iot_linker.MainActivity
+com.developsunghyun.iot_linker.Model.Repository.BluetoothControl +.. com.developsunghyun.iot_linker.Model.Repository.BluetoothControl$IOStream
 androidx.lifecycle.ViewModel <|-- com.developsunghyun.iot_linker.ViewModel.CreateViewModel
+androidx.lifecycle.ViewModel <|-- com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
+androidx.lifecycle.ViewModel <|-- com.developsunghyun.iot_linker.ViewModel.WidgetViewModel
 @enduml

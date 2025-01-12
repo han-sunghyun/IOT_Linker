@@ -19,9 +19,11 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.developsunghyun.iot_linker.Model.Repository.BluetoothControl
 import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.View.PermissionManager
@@ -29,6 +31,7 @@ import com.developsunghyun.iot_linker.View.Screen.BluetoothControlViewModelFacto
 import com.developsunghyun.iot_linker.View.Screen.HomeScreen
 import com.developsunghyun.iot_linker.View.Screen.LayoutCompositionView
 import com.developsunghyun.iot_linker.View.Screen.LayoutSelect
+import com.developsunghyun.iot_linker.View.Screen.WidgetView
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidgetScreen
 import com.developsunghyun.iot_linker.View.Widget.SwitchWidgetScreen
@@ -63,18 +66,30 @@ class MainActivity : ComponentActivity() {
 //                if(windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT){
 //                    Log.d("LOG", "${windowSizeClass.windowHeightSizeClass} | ${windowSizeClass.windowWidthSizeClass}")
 //                }
-
+                val widgetViewList = dbManager.getListData().value
+                widgetViewList?.get(0)?.let { Log.d("TEST", it.name) }
 
                 NavHost(
                     navController = navController,
                     startDestination = "homeScreen",
                 ) {
-                    composable("HomeScreen") { HomeScreen(navController, applicationContext, bluetoothViewModel) }
+                    composable("HomeScreen") { HomeScreen(navController, applicationContext, bluetoothViewModel, database = dbManager) }
                     composable("LayoutSelect") { LayoutSelect(navController = navController) }
                     composable("LayoutCompositionView") { LayoutCompositionView(navController = navController, bluetoothViewModel = bluetoothViewModel) }
 
-                    composable("ButtonWidgetScreen") { ButtonWidgetScreen(bluetoothViewModel) }
-                    composable("SwitchWidgetScreen") { SwitchWidgetScreen(bluetoothViewModel) }
+                    composable("ButtonWidgetScreen") { ButtonWidgetScreen(bluetoothViewModel = bluetoothViewModel, database = dbManager) }
+                    composable("SwitchWidgetScreen") { SwitchWidgetScreen(bluetoothViewModel = bluetoothViewModel, database = dbManager) }
+
+                    //WidgetView
+                    composable("WidgetView/{intValue}",
+                        arguments = listOf(navArgument("intValue") {
+                            type = NavType.IntType // 정수형 타입으로 설정
+                        }))
+                    {
+                        backStackEntry ->
+                        val intValue = backStackEntry.arguments?.getInt("intValue")
+                        WidgetView(bluetoothViewModel = bluetoothViewModel, database = dbManager, intValue = intValue!!)
+                    }
                 }
 
             }

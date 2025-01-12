@@ -66,13 +66,15 @@ fun LayoutCompositionView(
                 InterfaceLayout(
                     bluetoothViewModel = bluetoothViewModel,
                     layoutType = viewModel.layoutData.value.layoutType,
-                    widgetType = listOf("ButtonWidget","ButtonWidget"),
-                    setStrData1 = listOf("1slot 버튼1,1slot 버튼2", "2slot 버튼1,2slot 버튼1"),
-                    setStrData2 = listOf("0,1", "1,2"),
-                    writeData1Enable = listOf("true,true", "true,false"),
-                    writeData1 = listOf("a,b", "b,a"),
-                    writeData2Enable = listOf("true,true", "false,true"),
-                    writeData2 = listOf("b,a", "a,b")
+                    widgetType = listOf("ButtonWidget","SwitchWidget"),
+                    setStrData1 = listOf("1slot 버튼1,1slot 버튼2", "스위치1,스위치2"),
+                    setStrData2 = listOf("0,1", ""),
+                    writeData1Enable = listOf("true,true", ""),
+                    writeData1 = listOf("a,b", "a,b"),
+                    writeData2Enable = listOf("true,true", ""),
+                    writeData2 = listOf("b,a", "b,a"),
+                    readData1 = listOf("", "a,b"),
+                    readData2 = listOf("", "b,a"),
 
                 ).Layout()
             }

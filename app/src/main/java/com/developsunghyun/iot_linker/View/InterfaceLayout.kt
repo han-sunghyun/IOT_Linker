@@ -32,6 +32,11 @@ class InterfaceLayout(
     private val writeData3: List<String>? = null,
     private val writeData4: List<String>? = null,
 
+    private val readData1: List<String>? = null,
+    private val readData2: List<String>? = null,
+    private val readData3: List<String>? = null,
+    private val readData4: List<String>? = null,
+
 ) {
 
 
@@ -50,7 +55,15 @@ class InterfaceLayout(
                 )
             },
             "SwitchWidget" to {
-                SwitchWidget()
+                SwitchWidget(
+                    modifier = Modifier,
+                    bluetoothViewModel = bluetoothViewModel,
+                    labelStrList = setStrData1?.get(index),
+                    writeDataStrList1 = writeData1?.get(index),
+                    writeDataStrList2 = writeData2?.get(index),
+                    readDataStrList1 =  readData1?.get(index),
+                    readDataStrList2 =  readData2?.get(index),
+                )
             }
         )
     }
@@ -61,9 +74,19 @@ class InterfaceLayout(
                 module1 = { widget[0][widgetType?.get(0)]?.invoke() },
                 module2 = { widget[1][widgetType?.get(1)]?.invoke() }
             )
-        },
-        "Layout_2Slot_2" to { Layout_2Slot_2() },
-        "Layout_2Slot_3" to { Layout_2Slot_3() }
+                            },
+        "Layout_2Slot_2" to {
+            Layout_2Slot_2(
+                module1 = { widget[0][widgetType?.get(0)]?.invoke() },
+                module2 = { widget[1][widgetType?.get(1)]?.invoke() }
+            )
+                            },
+        "Layout_2Slot_3" to {
+            Layout_2Slot_3(
+            module1 = { widget[0][widgetType?.get(0)]?.invoke() },
+            module2 = { widget[1][widgetType?.get(1)]?.invoke() }
+            )
+        }
     )
 
     @Composable
