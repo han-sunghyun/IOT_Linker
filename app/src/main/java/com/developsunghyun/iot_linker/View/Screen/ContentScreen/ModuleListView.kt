@@ -31,6 +31,7 @@ fun ModuleScreen(
     windowSizeClass: WindowWidthSizeClass,
     database: LocalDataRepository,
 ){
+
     val widgetViewList by database.getListData().observeAsState(emptyList()) // LiveData를 관찰
     Box(
         modifier = Modifier

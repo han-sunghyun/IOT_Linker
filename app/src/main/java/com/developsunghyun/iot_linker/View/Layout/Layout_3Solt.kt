@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.View.Components.NoneModule
 import com.developsunghyun.iot_linker.View.Components.SlotBox
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
@@ -16,6 +17,7 @@ import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 //@Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
 fun Layout_3Slot_1(
+    database: LocalDataRepository? = null,
     module1: @Composable () -> Unit = { NoneModule() },
     module2: @Composable () -> Unit = { NoneModule() },
     module3: @Composable () -> Unit = { NoneModule() }
@@ -30,19 +32,19 @@ fun Layout_3Slot_1(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module1, slotNumber = 0)
+            SlotBox(module = module1, slotNumber = 0, database = database)
         }
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module2, slotNumber = 1)
+            SlotBox(module = module2, slotNumber = 1, database = database)
         }
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module3, slotNumber = 1)
+            SlotBox(module = module3, slotNumber = 2, database = database)
         }
     }
 }
@@ -50,6 +52,7 @@ fun Layout_3Slot_1(
 @Preview(showBackground = true, widthDp = 400, heightDp = 740)
 @Composable
 fun Layout_3Slot_2(
+    database: LocalDataRepository? = null,
     module1: @Composable () -> Unit = { ButtonWidget() },
     module2: @Composable () -> Unit = { NoneModule() },
     module3: @Composable () -> Unit = { NoneModule() }
@@ -68,20 +71,20 @@ fun Layout_3Slot_2(
                 modifier = Modifier
                     .weight(1f)
             ){
-                SlotBox(module = module1, slotNumber = 0)
+                SlotBox(module = module1, slotNumber = 0, database = database)
             }
             Box(
                 modifier = Modifier
                     .weight(1f)
             ){
-                SlotBox(module = module2, slotNumber = 1)
+                SlotBox(module = module2, slotNumber = 1, database = database)
             }
         }
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module3, slotNumber = 2)
+            SlotBox(module = module3, slotNumber = 2, database = database)
         }
     }
 }

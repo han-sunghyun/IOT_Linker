@@ -1,5 +1,6 @@
 package com.developsunghyun.iot_linker.View.Screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -8,26 +9,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.View.InterfaceLayout
-import com.developsunghyun.iot_linker.View.LayoutPrint
 import com.developsunghyun.iot_linker.ViewModel.BluetoothControlViewModel
 import com.developsunghyun.iot_linker.ViewModel.CreateViewModel
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayoutCompositionView(
     bluetoothViewModel: BluetoothControlViewModel,
     navController: NavController,
-    viewModel: CreateViewModel = viewModel(LocalContext.current as ViewModelStoreOwner)
+    viewModel: CreateViewModel = viewModel(LocalContext.current as ViewModelStoreOwner),
+    database: LocalDataRepository,
 ) {
-    viewModel.setModuleArray(0, "ButtonWidget")
-    viewModel.setModuleArray(1, "SwitchWidget")
+    val moduleListData by viewModel.modules.collectAsState()
+
+//    viewModel.setModuleArray(0, "ButtonWidget")
+//    viewModel.setModuleArray(1, "SwitchWidget")
 
     Scaffold(
         topBar = {
@@ -48,33 +55,20 @@ fun LayoutCompositionView(
                 .fillMaxSize()
                 .padding(paddingValues)
             ){
-//                LayoutPrint(
-//                    bluetoothViewModel,
-//                    layout = viewModel.layoutData.value.layoutType,
-//                    module = mutableListOf(
-//                        viewModel.layoutData.value.module0,
-//                        viewModel.layoutData.value.module1,
-//                        viewModel.layoutData.value.module2,
-//                        viewModel.layoutData.value.module3,
-//                        viewModel.layoutData.value.module4,
-//                        viewModel.layoutData.value.module5
-//                    ),
-//                    setStrData1 = mutableListOf("test1,test2,test3,test4,test5", "test6,test7,test8,test9,test10,test11,a,b,c"),
-//                    setStrData2 = mutableListOf("0,1,0,0,1", "true,false,true,false,false,true,false,false,true")
-//                ).PreView()
 
                 InterfaceLayout(
+                    database,
                     bluetoothViewModel = bluetoothViewModel,
-                    layoutType = viewModel.layoutData.value.layoutType,
-                    widgetType = listOf("ButtonWidget","SwitchWidget"),
-                    setStrData1 = listOf("1slot 버튼1,1slot 버튼2", "스위치1,스위치2"),
-                    setStrData2 = listOf("0,1", ""),
-                    writeData1Enable = listOf("true,true", ""),
-                    writeData1 = listOf("a,b", "a,b"),
-                    writeData2Enable = listOf("true,true", ""),
-                    writeData2 = listOf("b,a", "b,a"),
-                    readData1 = listOf("", "a,b"),
-                    readData2 = listOf("", "b,a"),
+                    layoutType = viewModel.interfaceLayoutType.value,
+                    widgetType = moduleListData.map { it.widgetType },
+                    setStrData1 = moduleListData.map { it.setStrData1 },
+                    setStrData2 = moduleListData.map { it.setStrData2 },
+                    writeData1Enable = moduleListData.map { it.writeData1Enable },
+                    writeData1 = moduleListData.map { it.writeData1 },
+                    writeData2Enable = moduleListData.map { it.writeData2Enable },
+                    writeData2 = moduleListData.map { it.writeData2 },
+                    readData1 = moduleListData.map { it.readData1 },
+                    readData2 = moduleListData.map { it.readData2 },
 
                 ).Layout()
             }

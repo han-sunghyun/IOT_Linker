@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.developsunghyun.iot_linker.Model.Repository.LocalDataRepository
 import com.developsunghyun.iot_linker.View.Components.NoneModule
 import com.developsunghyun.iot_linker.View.Components.SlotBox
 import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
@@ -21,6 +22,7 @@ import com.developsunghyun.iot_linker.View.Widget.ButtonWidget
 @Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
 fun Layout_2Slot_1(
+    database: LocalDataRepository? = null,
     module1: @Composable () -> Unit = { NoneModule() },
     module2: @Composable () -> Unit = { NoneModule() }
 
@@ -34,13 +36,13 @@ fun Layout_2Slot_1(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module1, slotNumber = 0)
+            SlotBox(module = module1, slotNumber = 0, database = database)
         }
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module2, slotNumber = 1)
+            SlotBox(module = module2, slotNumber = 1, database = database)
         }
     }
 }
@@ -48,6 +50,7 @@ fun Layout_2Slot_1(
 @Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
 fun Layout_2Slot_2(
+    database: LocalDataRepository? = null,
     module1: @Composable () -> Unit = { NoneModule() },
     module2: @Composable () -> Unit = { NoneModule() }
 
@@ -61,13 +64,13 @@ fun Layout_2Slot_2(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module1, slotNumber = 0)
+            SlotBox(module = module1, slotNumber = 0, database = database)
         }
         Box(
             modifier = Modifier
                 .weight(2f)
         ){
-            SlotBox(module = module2, slotNumber = 1)
+            SlotBox(module = module2, slotNumber = 1, database = database)
         }
     }
 }
@@ -75,6 +78,7 @@ fun Layout_2Slot_2(
 @Preview(showBackground = true, widthDp = 370, heightDp = 740)
 @Composable
 fun Layout_2Slot_3(
+    database: LocalDataRepository? = null,
     module1: @Composable () -> Unit = { NoneModule() },
     module2: @Composable () -> Unit = { NoneModule() }
 
@@ -88,13 +92,13 @@ fun Layout_2Slot_3(
             modifier = Modifier
                 .weight(2f)
         ){
-            SlotBox(module = module1, slotNumber = 0)
+            SlotBox(module = module1, slotNumber = 0, database = database)
         }
         Box(
             modifier = Modifier
                 .weight(1f)
         ){
-            SlotBox(module = module2, slotNumber = 1)
+            SlotBox(module = module2, slotNumber = 1, database = database)
         }
     }
 }

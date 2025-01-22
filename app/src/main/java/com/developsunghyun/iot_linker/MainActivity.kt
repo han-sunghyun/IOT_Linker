@@ -17,6 +17,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -53,7 +57,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             IOT_LinkerTheme() {
-
+                var selectIndex by remember { mutableIntStateOf(0) }
                 val navController = rememberNavController()
                 val dbManager = LocalDataRepository(applicationContext)
 
@@ -73,9 +77,9 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     startDestination = "homeScreen",
                 ) {
-                    composable("HomeScreen") { HomeScreen(navController, applicationContext, bluetoothViewModel, database = dbManager) }
+                    composable("HomeScreen") { HomeScreen(navController, applicationContext, bluetoothViewModel, database = dbManager, selectIndex = selectIndex){selectIndex = it} }
                     composable("LayoutSelect") { LayoutSelect(navController = navController) }
-                    composable("LayoutCompositionView") { LayoutCompositionView(navController = navController, bluetoothViewModel = bluetoothViewModel) }
+                    composable("LayoutCompositionView") { LayoutCompositionView(navController = navController, bluetoothViewModel = bluetoothViewModel, database = dbManager) }
 
                     composable("ButtonWidgetScreen") { ButtonWidgetScreen(bluetoothViewModel = bluetoothViewModel, database = dbManager) }
                     composable("SwitchWidgetScreen") { SwitchWidgetScreen(bluetoothViewModel = bluetoothViewModel, database = dbManager) }

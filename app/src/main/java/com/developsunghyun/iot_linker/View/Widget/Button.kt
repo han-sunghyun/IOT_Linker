@@ -51,7 +51,9 @@ import com.developsunghyun.iot_linker.ViewModel.WidgetViewModel
 import kotlinx.coroutines.launch
 import android.graphics.Bitmap
 import android.util.Base64
+import androidx.compose.foundation.Image
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,9 +91,15 @@ fun ButtonWidgetScreen(
                         onClick = {
                             //LayoutBitmapCapture()
                             coroutineScope.launch {
+                                // 기존 비트맵에서 해상도 낮추기
                                 bitmap = graphicsLayer.toImageBitmap()
-                                val bitmapByteArray = bitmapToByteArray(bitmap!!.asAndroidBitmap())
-                                Log.d("bitmap", bitmapByteArray.size.toString())
+                                val scaledBitmap = Bitmap.createScaledBitmap(
+                                    bitmap!!.asAndroidBitmap(),256, 256, true)
+                                // 리사이즈된 비트맵을 바이트 배열로 변환
+                                val bitmapByteArray = bitmapToByteArray(scaledBitmap)
+
+//                                bitmap = graphicsLayer.toImageBitmap()
+//                                val bitmapByteArray = bitmapToByteArray(bitmap!!.asAndroidBitmap())
 
                                 database.widgetDataInsert(
                                     name = "testName",
@@ -108,7 +116,10 @@ fun ButtonWidgetScreen(
 
                         }
                     ) {
-
+                        Image(
+                            painter = painterResource(id = R.drawable.save),
+                            contentDescription = ""
+                        )
                     }
                 }
             )

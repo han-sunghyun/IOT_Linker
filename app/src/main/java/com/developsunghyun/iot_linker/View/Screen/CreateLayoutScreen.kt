@@ -103,9 +103,7 @@ fun LayoutListView(
             items(layoutList) { layoutData -> // 데이터 객체를 변수명 'widgetData'로 사용
                 LayoutImageView(
                     onClick = {
-                        viewModel.setLayoutType(layoutType = layoutData.layoutType)
-                        viewModel.setSlitNumber(layoutData.slotNumber)
-
+                        viewModel.upDataInterfaceLayoutType(layoutData.layoutType)
                         navController.navigate("LayoutCompositionView")
                     },
                     image = layoutData.image

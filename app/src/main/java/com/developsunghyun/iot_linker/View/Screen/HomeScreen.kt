@@ -68,12 +68,13 @@ fun HomeScreen(
     context: Context,
     viewModel: BluetoothControlViewModel,
     database: LocalDataRepository,
+    selectIndex: Int,
+    getSelectIndex: (Int) -> Unit
 ) {
     // BluetoothControlViewModel 초기화 (viewModel() 사용)
     val bluetoothViewModel: BluetoothControlViewModel = viewModel
 
     val windowSizeClass = calculateWindowSizeClass(LocalContext.current as Activity)
-    var selectIndex by remember { mutableIntStateOf(0) }
 
     // 공통 레이아웃 처리 (BottomNavigation 또는 SideNavigation)
     NavigationLayout(
@@ -82,7 +83,7 @@ fun HomeScreen(
         navController = navController,
         windowSizeClass = windowSizeClass,
         viewModel = bluetoothViewModel,
-        onSelectIndexChanged = { newIndex -> selectIndex = newIndex },
+        onSelectIndexChanged = { newIndex -> getSelectIndex(newIndex) },
         isSideNavigation = windowSizeClass.widthSizeClass != WindowWidthSizeClass.Compact,
         database = database,
     )

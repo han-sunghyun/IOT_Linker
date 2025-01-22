@@ -1,28 +1,35 @@
 package com.developsunghyun.iot_linker.ViewModel
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.developsunghyun.iot_linker.Model.Data.LayoutItem
+import com.developsunghyun.iot_linker.Model.Data.ModuleData
+import com.developsunghyun.iot_linker.Model.Repository.ModuleRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class CreateViewModel : ViewModel() {
-    private val _layoutData = mutableStateOf(LayoutItem()) // 초기값 설정
-    val layoutData: State<LayoutItem> get() = _layoutData
+    private val repository = ModuleRepository()
 
-    fun setLayoutType(layoutType: String) {
-        _layoutData.value = _layoutData.value.copy(layoutType = layoutType)
+    private val _interfaceName = MutableStateFlow<String>("")
+    val interfaceName: StateFlow<String> = _interfaceName
+
+    private val _interfaceLayoutType = MutableStateFlow<String>("")
+    val interfaceLayoutType: StateFlow<String> = _interfaceLayoutType
+
+    private val _modules = MutableStateFlow<List<ModuleData>>(List(6) { ModuleData() })
+    val modules: StateFlow<List<ModuleData>> = _modules
+
+    fun upDataInterfaceName(name: String){
+        _interfaceName.value = name
     }
-    fun setSlitNumber(number: Int){
-        _layoutData.value = _layoutData.value.copy(slotNumber = number)
+    fun upDataInterfaceLayoutType(layoutType: String){
+        _interfaceLayoutType.value = layoutType
     }
-    fun setModuleArray(num: Int, module: String) {
-        when(num){
-            0 -> _layoutData.value = _layoutData.value.copy(module0 = module)
-            1 -> _layoutData.value = _layoutData.value.copy(module1 = module)
-            2 -> _layoutData.value = _layoutData.value.copy(module2 = module)
-            3 -> _layoutData.value = _layoutData.value.copy(module3 = module)
-            4 -> _layoutData.value = _layoutData.value.copy(module4 = module)
-            5 -> _layoutData.value = _layoutData.value.copy(module5 = module)
+    fun updateModule(index: Int, newModuleData: ModuleData) {
+        _modules.value = _modules.value.toMutableList().apply {
+            this[index] = newModuleData
         }
     }
 }
