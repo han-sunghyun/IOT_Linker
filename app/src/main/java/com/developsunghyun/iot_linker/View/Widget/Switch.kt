@@ -111,7 +111,7 @@ fun SwitchWidgetScreen(
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.save),
-                            contentDescription = ""
+                            contentDescription = " "
                         )
                     }
                 }
