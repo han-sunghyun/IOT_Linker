@@ -3,6 +3,7 @@ package com.developsunghyun.iot_linker.View.Widget
 import android.annotation.SuppressLint
 import android.util.Base64
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -107,7 +109,10 @@ fun SwitchWidgetScreen(
 
                         }
                     ) {
-
+                        Image(
+                            painter = painterResource(id = R.drawable.save),
+                            contentDescription = ""
+                        )
                     }
                 }
             )
